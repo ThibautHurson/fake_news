@@ -28,7 +28,7 @@ def create_twitter_url():
     # in_reply_to_user_id, lang, non_public_metrics, organic_metrics,
     # possibly_sensitive, promoted_metrics, public_metrics, referenced_tweets,
     # source, text, and withheld
-    handle = "PSG_English"
+    handle = "EmmanuelMacron"
     max_results = 10
     mrf = "max_results={}".format(max_results)
     q = "query=from:{}".format(handle)
