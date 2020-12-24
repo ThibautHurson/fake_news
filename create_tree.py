@@ -41,6 +41,7 @@ def create_tree(df):
 
 df = pd.DataFrame([[1,-1,[5,7]],[2,-1,[3]],[3,2,[4]],[4,3,[]],[5,1,[6]],[6,5,[]],[7,1,[8,9]],[8,7,[10]],[9,7,[]],[10,8,[]]],index=[1,2,3,4,5,6,7,8, 9, 10], columns=['tweet_id', 'tweet_parent', 'tweet_fils'])
 graph = create_tree(df)
+print(graph)
 p = nx.drawing.nx_pydot.to_pydot(graph)
 p.write_png('prapagation_graph.png')
 # nx.draw(p, with_labels=True, font_weight='bold')
