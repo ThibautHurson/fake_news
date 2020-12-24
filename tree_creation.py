@@ -5,21 +5,6 @@ import twint
 import time
 
 
-class Node:
-    def __init__(self, data, children=None):
-        self.data = data
-        if children: self.children = children
-        else: self.children = []
-
-
-    def add_children(self,child):
-        assert(child)
-        self.children.append(child)
-
-
-root = Node(1)
-# print(root.data)
-# print(root.children)
 
 # Configure Tweet
 config_t = twint.Config()
@@ -27,7 +12,7 @@ config_t.Search = "ForumZeroCarbone"
 #config_t.Limit = 100 #par tranche de 20-30
 config_t.Hide_output=True
 config_t.Pandas = True
-# config_t.Native_retweets=False 
+config_t.Native_retweets=False 
 
 
 # Search for Tweet
