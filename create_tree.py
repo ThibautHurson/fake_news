@@ -4,17 +4,6 @@ import numpy as np
 import networkx as nx
 import matplotlib.pyplot as plt
 
-
-class Node:
-    def __init__(self, data=None, children=[]):
-        self.data = data
-        self.children = children
-
-
-    def add_children(self,child):
-        assert(child)
-        self.children.append(child)
-
 #Tweet id c'est l'id du tweet
 #Tweet parent c'est l'id de son parent (si c'est un RT)
 #-1 dans tweet_parent: tweet original (point de départ)
