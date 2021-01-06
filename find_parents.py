@@ -37,7 +37,9 @@ def find_parents(db) :
             #enfants[i]=-1
         if db.at[i,'retweet'] :
             parent_user_id=int(db.at[i,'user_rt_id'])
+            #On crée la liste des tweets postés par le père
             tweets_parent_pot=db[(db.user_id==parent_user_id)]
+            #Levées d'exceptions : tweets not in DB
             if tweets_parent_pot.empty:
                 parent_user_id=int(db.at[i,'user_rt_id'])+1
                 tweets_parent_pot=db[(db.user_id==parent_user_id)]
@@ -46,23 +48,32 @@ def find_parents(db) :
                     tweets_parent_pot=db[(db.user_id==parent_user_id)]
                     if tweets_parent_pot.empty:
                         parents[i]=-1 #Not in DB
-                        
                         continue
+
             # arg de db.at[i,'user_rt']==tweets_parents_pot[]
+
+            #On veut retrouver le tweet original dans les différents tweets du père
+            #On fait des filtrage successifs
+
+            #1er filtre : nretweets>0, tweets postés à la même heure.
             tweet_parent=tweets_parent_pot[(tweets_parent_pot.nretweets>0)&(tweets_parent_pot.date==db.at[i,'retweet_date'][0:19])]
+            
+            
             if tweet_parent.shape[0]<1:
                 parents[i]=-1 #Not in DB
                 
             elif tweet_parent.shape[0]>1:
+                
+                #2ème filtre : comparaison texte 
                 id_parent=comparaison_texte(tweet_parent,db.at[i,'user_rt'])
                 parents[i]=id_parent
                 #print(tweet_parent.id)
-                enfants[db[db.id==int(tweet_parent.id.values[0])].index.values[0]].append(id_parent)
+                enfants[db[db.id==int(tweet_parent.id.values[0])].index.values[0]].append(int(db.at[i,'id']))
                 continue
             try :
                 parents[i]=int(tweet_parent.id.values[0])
-                enfants[db[db.id==int(tweet_parent.id)].index.values[0]].append(int(tweet_parent.id.values[0]))
-            except TypeError :
+                enfants[db[db.id==int(tweet_parent.id)].index.values[0]].append(int(db.at[i,'id'])) #erreur ici
+            except TypeError : #debugging
                 print(i)
                 #print(parent_user_id)
                 #print(tweet_parent.head())
