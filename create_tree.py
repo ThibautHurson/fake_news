@@ -42,6 +42,3 @@ def create_tree(df, root_child = None):
 # p.write_png('prapagation_graph.png')
 # nx.draw(p, with_labels=True, font_weight='bold')
 # plt.show()
-
-
-# def create_subtree(db)
