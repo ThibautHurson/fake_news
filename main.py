@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from find_parents import *
 from create_tree import *
-
+#from AnalyseG import *
 
 def main() :
     db_tweet = pd.read_csv('twint_ForumCarbone.csv',encoding='latin-1')
@@ -18,8 +18,9 @@ def main() :
     # print(db.columns)
     graph = create_tree(db)
     p = nx.drawing.nx_pydot.to_pydot(graph)
-    p.write_png('prapagation_graph.png')
+    p.write_png('propagation_graph.png')
 
-    return
-
+    return 
 main()
+#Data_set=main()
+#Data_set.to_excel("ForumCarbone_treated.xlsx") 

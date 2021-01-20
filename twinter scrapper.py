@@ -7,14 +7,14 @@ c.Search = "ForumZeroCarbone"
 c.Hide_output=True
 c.Limit=10
 c.Pandas = True
-#c.Native_retweets=True
+c.Native_retweets=False
 
 
 # Run
 twint.run.Search(c)
 
 Tweets_df = twint.storage.panda.Tweets_df
-Tweets_df.to_excel("16122020_Tweets.xlsx")
+Tweets_df.to_excel("14012021_Tweets.xlsx")
 
 # Configure
 d = twint.Config()
@@ -29,4 +29,4 @@ d.Native_retweets=True
 twint.run.Search(d)
 
 RTweets_df = twint.storage.panda.Tweets_df
-RTweets_df.to_excel("16122020_RT.xlsx") 
+RTweets_df.to_excel("14012021_RT.xlsx") 

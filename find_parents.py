@@ -84,7 +84,7 @@ def find_parents(db) :
                 print(db[db.id==int(tweet_parent.id)].id.values[0])
                 return
     retour=parents,enfants
-    print(retour)
+    #print(retour)
     return retour
 
 #parents=find_parents(db_tweet,db_retweet)
