@@ -1,26 +1,32 @@
 import pandas as pd
 import numpy as np
 from find_parents import *
+from find_parents2 import *
+
 from create_tree import *
-#from AnalyseG import *
+import networkx as nx
+import matplotlib.pyplot as plt
+from networkx.drawing.nx_pydot  import graphviz_layout
+# import igraph as ig
 
 def main() :
-    db_tweet = pd.read_csv('twint_ForumCarbone.csv',encoding='latin-1')
-    db_retweet = pd.read_csv('twint_RTTest.csv',encoding='latin-1')
-    db = pd.concat([db_tweet,db_retweet],ignore_index=True)
-    parents,enfants = find_parents(db)
+    db_tweet = pd.read_csv('twint_ForumCarbone.csv', encoding='latin-1')
+    db_retweet = pd.read_csv('twint_RTTest.csv', encoding='latin-1')
+    db = pd.concat([db_tweet,db_retweet], ignore_index=True)
+    parents,enfants = find_parents2(db) #FIND_PARENT 1 ou 2 ICI
     db['Parents'] = parents
     db['Enfants'] = enfants
-    # print(db[db.Parents==-1].shape)
-    # print(db[db.Parents==-1].head())
-    # print(db[db.Parents==0].head())
 
-    # print(db.columns)
-    graph = create_tree(db)
-    p = nx.drawing.nx_pydot.to_pydot(graph)
-    p.write_png('propagation_graph.png')
+    # print(list(db['Enfants']))
 
-    return 
-main()
-#Data_set=main()
-#Data_set.to_excel("ForumCarbone_treated.xlsx") 
+    graph = create_tree(db, root_child=None)
+    pos = nx.drawing.nx_pydot.pydot_layout(graph, prog='dot') #"neato" pour les graph stylés mais marche que sous linux/mac
+    # pos[0] = np.array([0, 0])
+    # plt.figure(figsize=(8, 8))
+    nx.draw_networkx(graph, pos = pos, node_size=15, width=0.3, alpha=0.8, node_color="skyblue",edge_color='grey', with_labels=False)
+    plt.savefig('propagation_graph.png')
+    plt.show()
+
+if __name__ == "__main__":
+    # execute only if run as a script
+    main()
