@@ -22,7 +22,6 @@ def main() :
     db['user_id'] = pd.to_numeric(db['user_id'])
     db['id'] = pd.to_numeric(db['id'])
     db['user_rt_id'] = pd.to_numeric(db['user_rt_id'])
-    db['user_rt_id'] = pd.to_numeric(db['user_rt_id'])
 
     # db.to_excel('dataset.xlsx')
 
