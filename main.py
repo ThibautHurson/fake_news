@@ -14,7 +14,7 @@ def main() :
     # db_tweet = pd.read_excel('twint_ForumCarbone.xlsx')#, encoding='latin-1')
     # db_retweet = pd.read_excel('twint_RTTest.xlsx')#, encoding='latin-1') #read_csv
     # db = pd.concat([db_tweet,db_retweet], ignore_index=True)
-    with open('testPickle2.pkl','rb') as f:
+    with open('testPickle.pkl','rb') as f:
         db = pkl.load(f) 
         
     # Data cleaning
@@ -30,7 +30,7 @@ def main() :
     db['Parents'] = parents
     db['Enfants'] = enfants
 
-    graph = create_tree(db, root_child=100)
+    graph = create_tree(db, root_child=None)
     pos = nx.drawing.nx_pydot.pydot_layout(graph, prog='dot') #"neato" pour les graph stylés mais marche que sous linux/mac
     # plt.figure(figsize=(8, 8))
     nx.draw_networkx(graph, pos = pos, node_size=15, width=0.3, alpha=0.8, node_color="skyblue",edge_color='grey', with_labels=False)
