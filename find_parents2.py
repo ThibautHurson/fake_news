@@ -79,8 +79,7 @@ def find_parents3(db):
     for i, row in db_tweet_retweeted.iterrows():
         parent_tweet_id = row['id'] #tweet id
 
-        #We create a df of this "father"'s retweeters. Note: It takes into account this person plublished tweet that are in 
-        #this database. (i.e can be retweeters from different tweets)
+        #We create a df of this initial tweet retweets
         df_this_tweet_retweeters  = db_retweet[db_retweet['retweet_id'] == parent_tweet_id]
 
 
@@ -92,68 +91,42 @@ def find_parents3(db):
             #than a2 and if a2 follows a1 
             df_this_tweet_retweeters.sort_values(by=['day','hour'])
 
+            already_child = set([])
+
             current_parent_id = parent_tweet_id
             current_parent_idx = i
-            queue_childs = collections.deque([(current_parent_idx,current_parent_id)])
 
             while not df_this_tweet_retweeters.empty:
-                # print('df_rtwers')
                 current_size = len(df_this_tweet_retweeters.index)
-                print('df_this_tweet_retweeters size',current_size)
-                print('queue_childs',len(queue_childs))
-                if not queue_childs:
-                    print('empty queue')
-                #It means that there is no more parent-child relationship possible between retweeters
-                #we assume every last retweeters to be the original tweeter's children
-                    for idx, row_user in df_this_tweet_retweeters.iterrows():
-                        parents[idx] = parent_tweet_id
-                    break
-
-                current_parent_idx, current_parent_id = queue_childs.popleft()
+                # print('df_this_tweet_retweeters size',current_size)
 
                 for idx, row_user in df_this_tweet_retweeters.iterrows():
-                    print(db[db.index == current_parent_idx].user_id.values[0])
-                    print(row_user['user_id'])
-                    status = api.show_friendship(source_id = db[db.index == current_parent_idx].user_id.values[0], target_id = row_user['user_id'])
-                    print(status[1].following)
-                    if status[1].following:
-                        print('friend')
-                        enfants[current_parent_idx].append(row_user['id'])
-                        parents[idx] = current_parent_id
+                    #If the retweet is already the child of another retweet, we do not need to find its father anymore
+                    if row_user['id'] not in already_child:
+                        print(db[db.index == current_parent_idx].user_id.values[0])
+                        # print(row_user['user_id'])
+                        status = api.show_friendship(source_id = db[db.index == current_parent_idx].user_id.values[0], target_id = row_user['user_id'])
+                        # print(status[1].following)
+                        if status[1].following:
+                            print('friends')
+                            enfants[current_parent_idx].append(row_user['id'])
+                            parents[idx] = current_parent_id
 
-                        queue_childs.append((idx,row_user['id']))
-                        df_this_tweet_retweeters.drop(index = idx,inplace = True)
-                        print('------------------------\n')
-                        print(enfants)
+                            already_child.add(row_user['id'])
 
+                            # df_this_tweet_retweeters.drop(index = idx,inplace = True)
+                            print('------------------------\n')
+                            print(enfants)
+
+                current_parent_id = df_this_tweet_retweeters.id.values[0]
+                current_parent_idx = df_this_tweet_retweeters.index.values[0]
+
+                #If it is not the first iteration
+                if current_parent_idx != i:
+                    #Drop the most recent retweeter
+                    df_this_tweet_retweeters.drop(index = current_parent_idx,inplace = True)
 
     return parents,enfants
-
-        #Trier par le temps, puis par followers
-        # for idx, row_retweeter in df_this_tweet_retweeters.iterrows():
-
-
-        #On crée la liste des tweets postés par le père
-        # tweets_parent_pot = db[(db.user_id == parent_user_id)]
-
-        # #On veut retrouver le tweet original dans les différents tweets du père. Filtrage successifs
-        # #1er filtre : nretweets>0, tweets postés à la même heure.
-        # tweet_parent = tweets_parent_pot[(tweets_parent_pot.nretweets > 0) & (tweets_parent_pot.date == row['retweet_date'][0:19])]
-        # if not tweet_parent.shape[0]: #If no match found using the 1st filter, than this tweet's parent is not in the DB 
-        #     parents[i] = -1 #Not in database           
-        # else:
-        #     id_parent = comparaison_texte(tweet_parent,row['user_rt']) #2ème filtre : comparaison texte 
-        #     parents[i] = id_parent #To associate the tweet parent id to the corresponding tweet children
-        #     # enfants[db[db.id == id_parent].index.values[0]].append(int(row['id'])) #For each tweet parent we create the list of its tweet children
-        # if row['id'] not in db_retweet['user_rt_id']:
-        #     #As the tweet's retweets are not in the database, we give parents[i] the default -1 so that we do not take this tweet into account
-        #     parents[i] = -1
-        # else:
-        #     #We want to find interconnections between one tweet's retweeters in order to find out who retweeted who
-        #     db_retweeters = db_retweet[db_retweet['user_rt_id'] == row['id']]
-        #     # for retweeter_idx, row_retweeter in db_retweeters.iterrows():
-        #         #Trouve ceux qui follow l'originel et on les prend comme les mecs de bases. Puis en fonction du temps.
-
 
 
 def get_followings(username):
