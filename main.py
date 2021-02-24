@@ -14,13 +14,13 @@ def main() :
     # db_tweet = pd.read_excel('twint_ForumCarbone.xlsx')#, encoding='latin-1')
     # db_retweet = pd.read_excel('twint_RTTest.xlsx')#, encoding='latin-1') #read_csv
     # db = pd.concat([db_tweet,db_retweet], ignore_index=True)
-
-    with open('colis_covid_T.pkl','rb') as f:
+    name = 'fakesnow'
+    with open(name + '_T.pkl','rb') as f:
         db_tw = pkl.load(f) 
-    with open('colis_covid_RT.pkl','rb') as f:
+    with open(name + '_RT.pkl','rb') as f:
         db_rt = pkl.load(f)
     db = pd.concat([db_tw,db_rt], ignore_index=True)
-    db.to_excel('colis_covid.xlsx')
+    
     
     # with open('testPickle2.pkl','rb') as f:
     #     db = pkl.load(f) 
@@ -46,6 +46,7 @@ def main() :
     parents,enfants = find_parents3(db) 
     db['Parents'] = parents
     db['Enfants'] = enfants
+    db.to_pickle(name + '.pkl')
 
     graph = create_tree(db, root_child=None)
     pos = nx.drawing.nx_pydot.pydot_layout(graph, prog='dot') #"neato" ou "twopi" pour les graph stylés mais marche que sous linux/mac
