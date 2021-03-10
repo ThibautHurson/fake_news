@@ -31,25 +31,7 @@ def comparaison_texte(database,texte_tweet):
 #       tweet.append(parent_tweet id)
 
 #chope user_rt_id pour chopper tous les rtweeters
-def find_parents2(db) :
-    parents=np.zeros((db.shape[0],1))
-    enfants=[[] for i in range(db.shape[0])]
-    db_retweet = db[db['retweet'] == True]
-    for i, row in db_retweet.iterrows():
-        parent_user_id = int(row['user_rt_id'])
-        #On crée la liste des tweets postés par le père
-        tweets_parent_pot = db[(db.user_id == parent_user_id)]
 
-        #On veut retrouver le tweet original dans les différents tweets du père. Filtrage successifs
-        #1er filtre : nretweets>0, tweets postés à la même heure.
-        tweet_parent = tweets_parent_pot[(tweets_parent_pot.nretweets > 0) & (tweets_parent_pot.date == row['retweet_date'][0:19])]
-        if not tweet_parent.shape[0]: #If no match found using the 1st filter, than this tweet's parent is not in the DB 
-            parents[i] = -1 #Not in DB           
-        else:
-            id_parent = comparaison_texte(tweet_parent,row['user_rt']) #2ème filtre : comparaison texte 
-            parents[i] = id_parent #To associate the tweet parent id to the corresponding tweet children
-            enfants[db[db.id == id_parent].index.values[0]].append(int(row['id'])) #For each tweet parent we create the list of its tweet children
-    return parents,enfants
 
 def find_parents3(db):
     consumer_key = "6ljnnBOMpNjmKGHh0DpoczkMC" 
@@ -64,7 +46,7 @@ def find_parents3(db):
     auth.set_access_token(access_token, access_token_secret) 
       
     # calling the api  
-    api = tweepy.API(auth, wait_on_rate_limit=True)
+    api = tweepy.API(auth, wait_on_rate_limit=True,wait_on_rate_limit_notify=True,retry_count=10, retry_delay=5, retry_errors=set([503])) #Over capacity which Corresponds with HTTP 503. Twitter is temporarily over capacity
 
 
     parents=np.zeros((db.shape[0],1))
@@ -77,6 +59,7 @@ def find_parents3(db):
     # unique_user_rt_id = db_retweet.user_rt_id[pd.unique(db['user_rt_id'])]
 
     for i, row in db_tweet_retweeted.iterrows():
+        print('row number',i)
         parent_tweet_id = row['id'] #tweet id
 
         #We create a df of this initial tweet retweets
@@ -98,25 +81,60 @@ def find_parents3(db):
 
             while not df_this_tweet_retweeters.empty:
                 current_size = len(df_this_tweet_retweeters.index)
-                # print('df_this_tweet_retweeters size',current_size)
+                print('df_this_tweet_retweeters size',current_size)
 
                 for idx, row_user in df_this_tweet_retweeters.iterrows():
                     #If the retweet is already the child of another retweet, we do not need to find its father anymore
                     if row_user['id'] not in already_child:
                         print(db[db.index == current_parent_idx].user_id.values[0])
                         # print(row_user['user_id'])
-                        status = api.show_friendship(source_id = db[db.index == current_parent_idx].user_id.values[0], target_id = row_user['user_id'])
-                        # print(status[1].following)
-                        if status[1].following:
-                            print('friends')
-                            enfants[current_parent_idx].append(row_user['id'])
-                            parents[idx] = current_parent_id
+                        try:
+                            status = api.show_friendship(source_id = db[db.index == current_parent_idx].user_id.values[0], target_id = row_user['user_id'])#show_friendship
+                            # print(status[1].following)
+                            if status[1].following:
+                                print('friends')
+                                enfants[current_parent_idx].append(row_user['id'])
+                                parents[idx] = current_parent_id
 
-                            already_child.add(row_user['id'])
+                                already_child.add(row_user['id'])
 
-                            # df_this_tweet_retweeters.drop(index = idx,inplace = True)
-                            print('------------------------\n')
-                            print(enfants)
+                                # df_this_tweet_retweeters.drop(index = idx,inplace = True)
+                                print('------------------------\n')
+                                print(enfants)
+                        except tweepy.error.TweepError as e:
+                            if e == [{'code': 50, 'message': 'User not found.'}]: #User not found
+                                continue
+                            else:
+                                try: #Handle potential connection error
+                                    api = tweepy.API(auth, wait_on_rate_limit=True,wait_on_rate_limit_notify=True,retry_count=10, retry_delay=5, retry_errors=set([503]))
+                                    
+                                    status = api.show_friendship(source_id = db[db.index == current_parent_idx].user_id.values[0], target_id = row_user['user_id'])#show_friendship
+                                    # print(status[1].following)
+                                    if status[1].following:
+                                        print('friends')
+                                        enfants[current_parent_idx].append(row_user['id'])
+                                        parents[idx] = current_parent_id
+
+                                        already_child.add(row_user['id'])
+
+                                        # df_this_tweet_retweeters.drop(index = idx,inplace = True)
+                                        print('------------------------\n')
+                                        print(enfants)
+                                except tweepy.error.TweepError as er: #If it is not a connection error nor a 'user not found error' we just go to the next user
+                                    print('unknow tweepy error passed: ', er)
+                                    continue
+
+                # followers = get_followings_from_id(db[db.index == current_parent_idx].user_id.values[0])
+                # print(followers)
+                # for follower_id in followers:
+                #     #If the retweet is already the child of another retweet, we do not need to find its father anymore
+                #     if follower_id not in already_child and follower_id in df_this_tweet_retweeters.user_id:
+                #         print('friend', follower_id)
+                #         enfants[current_parent_idx].append(follower_id)
+                #         parents[idx] = current_parent_id
+
+                #         already_child.add(follower_id)
+
 
                 current_parent_id = df_this_tweet_retweeters.id.values[0]
                 current_parent_idx = df_this_tweet_retweeters.index.values[0]
@@ -151,14 +169,44 @@ def get_followings(username):
     ids = []
     for page in tweepy.Cursor(api.followers_ids, screen_name=username).pages():
         ids.extend(page)
+        time.sleep(20)
+
+    # print len(ids)
+
+    return ids
+
+def get_followings_from_id(user_id):
+    '''
+    Input: username: name of the user
+    Output: list of followers ids
+    '''
+    print('in get_following_from_id')
+    consumer_key = "6ljnnBOMpNjmKGHh0DpoczkMC" 
+    consumer_secret = "NDafWcimWv9AF2Aul8yQKVwcmSROmVc8D9wFEjNHGV2VdcXoPb" 
+    access_token = "1322253203296210945-HVnEkHfqdKtlX9TADHUZBHSWQvZWpP" 
+    access_token_secret = "bBmEzaEJcmwB94WRpprR1UqKqDdeGdYY1zekr2WjjTpKC" 
+      
+    # authorization of consumer key and consumer secret 
+    auth = tweepy.OAuthHandler(consumer_key, consumer_secret) 
+      
+    # set access to user's access key and access secret  
+    auth.set_access_token(access_token, access_token_secret) 
+      
+    # calling the api  
+    api = tweepy.API(auth) 
+
+    ids = []
+    for page in tweepy.Cursor(api.followers_ids, id=user_id).pages():
+        print('go')
+        ids.extend(page)
         time.sleep(60)
 
     # print len(ids)
 
     return ids
 
-# print(get_followings('Pontsbschool'))
+#print(get_followings('Pontsbschool'))
 
-# print(ids)
+#print(ids)
 
   

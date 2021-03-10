@@ -8,13 +8,15 @@ from create_tree import *
 import networkx as nx
 import matplotlib.pyplot as plt
 from networkx.drawing.nx_pydot  import graphviz_layout
+import time
 # import igraph as ig
 
 def main() :
     # db_tweet = pd.read_excel('twint_ForumCarbone.xlsx')#, encoding='latin-1')
     # db_retweet = pd.read_excel('twint_RTTest.xlsx')#, encoding='latin-1') #read_csv
     # db = pd.concat([db_tweet,db_retweet], ignore_index=True)
-    name = 'fakesnow'
+    start = time.time()
+    name = 'stevie_wonder_ghana'#'merrick_garland_liar_BillBarr'#'JoeBiden_Nword'#'fakesnow'
     with open(name + '_T.pkl','rb') as f:
         db_tw = pkl.load(f) 
     with open(name + '_RT.pkl','rb') as f:
@@ -47,6 +49,9 @@ def main() :
     db['Parents'] = parents
     db['Enfants'] = enfants
     db.to_pickle(name + '.pkl')
+
+    end = time.time()
+    print('Epoch: ' + str(start-end))
 
     graph = create_tree(db, root_child=None)
     pos = nx.drawing.nx_pydot.pydot_layout(graph, prog='dot') #"neato" ou "twopi" pour les graph stylés mais marche que sous linux/mac
