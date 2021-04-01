@@ -56,18 +56,24 @@ def find_parents3(db):
     db_tweet_retweeted = db[(db['retweet'] == False) & (db['nretweets'] > 0)] 
     db_retweet = db[db['retweet'] == True]
 
-    # unique_user_rt_id = db_retweet.user_rt_id[pd.unique(db['user_rt_id'])]
 
     for i, row in db_tweet_retweeted.iterrows():
+        #Test if user still exist
+        try:
+            status_user = api.get_user(row['user_id'])
+        except tweepy.error.TweepError as e:
+            continue
         print('row number',i)
         parent_tweet_id = row['id'] #tweet id
 
         #We create a df of this initial tweet retweets
-        df_this_tweet_retweeters  = db_retweet[db_retweet['retweet_id'] == parent_tweet_id]
+        #POURQUOI ÇA MARCHE PAS?? en soit j'en ai plus besoin si je regarde qu'un seul tweet retweets
+        df_this_tweet_retweeters  = db_retweet#db_retweet[db_retweet['retweet_id'] == parent_tweet_id]
 
 
         if df_this_tweet_retweeters.empty: #Retweeters of this tweet are not in the dataset
             parents[i] = -1
+            print('Marche pas')
         else:
             #Retweeters of this tweet are in the dataset.
             #We assume that if a1 and a2 retweeted a0, than a2 is a child of a1 iff a1 retweeted the tweet earlier 
@@ -78,6 +84,10 @@ def find_parents3(db):
 
             current_parent_id = parent_tweet_id
             current_parent_idx = i
+
+            #Initialize the parent of every retweeters to the initial retweeter
+            for idx, row_user in df_this_tweet_retweeters.iterrows():
+                parents[idx] = current_parent_id
 
             while not df_this_tweet_retweeters.empty:
                 current_size = len(df_this_tweet_retweeters.index)
@@ -98,11 +108,13 @@ def find_parents3(db):
 
                                 already_child.add(row_user['id'])
 
-                                # df_this_tweet_retweeters.drop(index = idx,inplace = True)
                                 print('------------------------\n')
                                 print(enfants)
                         except tweepy.error.TweepError as e:
-                            if e == [{'code': 50, 'message': 'User not found.'}]: #User not found
+                            #Test if the retweeter still exist. If he doesn't exist anymore, we remove him from the retweeters dataframe
+                            if e.api_code == 50:# [{'code': 50, 'message': 'User not found.'}]: #User not found
+                                print('User not found')
+                                df_this_tweet_retweeters.drop(index = idx ,inplace = True)
                                 continue
                             else:
                                 try: #Handle potential connection error
@@ -117,29 +129,16 @@ def find_parents3(db):
 
                                         already_child.add(row_user['id'])
 
-                                        # df_this_tweet_retweeters.drop(index = idx,inplace = True)
                                         print('------------------------\n')
                                         print(enfants)
                                 except tweepy.error.TweepError as er: #If it is not a connection error nor a 'user not found error' we just go to the next user
                                     print('unknow tweepy error passed: ', er)
                                     continue
 
-                # followers = get_followings_from_id(db[db.index == current_parent_idx].user_id.values[0])
-                # print(followers)
-                # for follower_id in followers:
-                #     #If the retweet is already the child of another retweet, we do not need to find its father anymore
-                #     if follower_id not in already_child and follower_id in df_this_tweet_retweeters.user_id:
-                #         print('friend', follower_id)
-                #         enfants[current_parent_idx].append(follower_id)
-                #         parents[idx] = current_parent_id
-
-                #         already_child.add(follower_id)
-
-
                 current_parent_id = df_this_tweet_retweeters.id.values[0]
                 current_parent_idx = df_this_tweet_retweeters.index.values[0]
 
-                #If it is not the first iteration
+                #If it is not the first iteration. Because if it's the first iteration, current_parent_idx is the initial tweet
                 if current_parent_idx != i:
                     #Drop the most recent retweeter
                     df_this_tweet_retweeters.drop(index = current_parent_idx,inplace = True)
