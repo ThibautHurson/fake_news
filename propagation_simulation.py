@@ -15,11 +15,12 @@ def generate_prop_graph() :
 
 	#Pick a propagator
 	idx = np.random.randint(len(G))
-	n_max = 100
+	
 	p = 0.8
+	decay=0.2
 
 	#Get graph	
-	result, prop = BFS_propagation(G,idx,p)
+	result, prop = BFS_propagation(G,idx,p,decay)
 
 	#Create Labels
 	labeldict = {}
@@ -35,34 +36,38 @@ def generate_prop_graph() :
 	#Print Graph
 	print(result)
 	pos = nx.drawing.nx_pydot.pydot_layout(prop, prog='dot')
-	nx.draw_networkx(prop, pos,labels=labeldict, node_size=15,alpha=0.6,node_color=colors, with_labels=True) #width=0.3,node_size=15, 
+	nx.draw_networkx(prop, pos, node_size=15,alpha=0.6) #width=0.3,node_size=15, 
 	nx.draw_networkx_edges(prop, pos, edge_color='grey',alpha=0.1)
 	plt.show()
 
-	#pos = nx.spring_layout(G)
-	#nx.draw_networkx(G, pos,labels=labeldict, node_size=15,alpha=0.6, node_color=colors, with_labels=True) #width=0.3,node_size=15, 
-	#nx.draw_networkx_edges(G, pos, edge_color='grey',alpha=0.1)
-	#plt.show()
+	pos = nx.spring_layout(G)
+	nx.draw_networkx(G, pos,labels=labeldict, node_size=15,alpha=0.6, node_color=colors, with_labels=True) #width=0.3,node_size=15, 
+	nx.draw_networkx_edges(G, pos, edge_color='grey',alpha=0.1)
+	plt.show()
 
+	#Pickle Time
+	name=str(idx)+'_propagation_tree.pkl'
+	nx.write_gpickle(prop, name)
 	return
 
 
-def BFS_propagation(G,v,p): #Inspired from BFS
+def BFS_propagation(G,v,p_start,decay): #Inspired from BFS
 	Prop=nx.DiGraph()
 	seen = [v]
 	active = [v]
 	result = []
+	distances = {v : 0}
 	while(len(active) != 0):
 		w = active.pop(0)
 		result.append(w)
 		Prop.add_nodes_from([w])
 		for x in G[w]:
-			if x not in seen and np.random.random() < p:
+			if x not in seen and np.random.random() < p_start*(1-decay)**(distances[w]+1):
 				Prop.add_edges_from([(w,x)])
 				seen.append(x)
 				active.append(x)
+				distances[x] = distances[w] + 1
 	return result, Prop
-
 
 def get_gif(G, result):
 	# Create a directory if don't exist to store images that will be used to create the gif
