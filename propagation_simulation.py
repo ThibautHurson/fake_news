@@ -11,18 +11,19 @@ def BFS_propagation(G,v,p,n_max): #Inspired from BFS
 	seen = [v]
 	active = [v]
 	result = []
-	n = 0
-	while(len(active) != 0):# and n < n_max:
-		# n += 1
+	while(len(active) != 0):
 		w = active.pop(0)
 		result.append(w)
 		for x in G[w]:
 			if x not in seen and np.random.random() < p:
 				seen.append(x)
 				active.append(x)
-	return seen
+	return result
 
+#Load a graph
 G = nx.read_gpickle('network_simulation.pkl')
+
+#Pick a propagator
 idx = np.random.randint(len(G))
 n_max = 100
 p = 0.8
@@ -32,58 +33,62 @@ result = BFS_propagation(G,idx,p,n_max)
 print(result)
 
 
-# labeldict = {}
-# colors = []
-# for i, val in enumerate(G):
-# 	if i in result:		
-# 		labeldict[val] = result.index(i)
-# 		colors.append('r')
-# 	else:
-# 		labeldict[val] = ''
-# 		colors.append('b')
-
-
-# pos = nx.spring_layout(G)
-# # nx.draw(G, labels=labeldict, with_labels = True)
-# nx.draw_networkx(G, pos,labels=labeldict, node_size=15,alpha=0.6, node_color=colors, with_labels=True) #width=0.3,node_size=15, 
-# nx.draw_networkx_edges(G, pos, edge_color='grey',alpha=0.1)
-# plt.show()
-
-
-# Create a directory if don't exist to store images that will be used to create the gif
-dir_images = "images_for_gif"
-if not os.path.exists(dir_images):
-    os.mkdir(dir_images)
-else:
-	shutil.rmtree(dir_images) #Delete the folder and its content
-	os.mkdir(dir_images)
-
-
-labeldict = {val:'' for val in G}
-colors = ['b'] * len(G) #Initialize each vertex color to black
+labeldict = {}
+colors = []
+for i, val in enumerate(G):
+	if i in result:		
+		labeldict[val] = result.index(i)
+		colors.append('r')
+	else:
+		labeldict[val] = ''
+		colors.append('b')
 
 pos = nx.spring_layout(G)
+nx.draw_networkx(G, pos,labels=labeldict, node_size=15,alpha=0.6, node_color=colors, with_labels=True) #width=0.3,node_size=15, 
+nx.draw_networkx_edges(G, pos, edge_color='grey',alpha=0.1)
+plt.show()
 
-for i in range(len(result)):
-	node_idx = result[i]
-	labeldict[node_idx] = i
-	colors[node_idx] = 'r'
 
-	nx.draw_networkx(G, pos,labels=labeldict, node_size=15,alpha=0.6, node_color=colors, with_labels=True) #width=0.3,node_size=15, 
-	nx.draw_networkx_edges(G, pos, edge_color='grey',alpha=0.1)
-	plt.savefig(dir_images +"/image_{}.png".format(str(i)), dpi=1200)
+def get_propagation_graph(G, result):
+	
 
 
 
-dir_gif = "gif"
-if not os.path.exists(dir_gif):
-    os.mkdir(dir_gif)
+def get_gif(G, result):
+	# Create a directory if don't exist to store images that will be used to create the gif
+	dir_images = "images_for_gif"
+	if not os.path.exists(dir_images):
+	    os.mkdir(dir_images)
+	else:
+		shutil.rmtree(dir_images) #Delete the folder and its content
+		os.mkdir(dir_images)
 
-# filepaths
-fp_in = dir_images +"/image_*.png"
-fp_out = dir_gif + "/image.gif"
 
-# https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html#gif
-img = [Image.open(dir_images +"/image_{}.png".format(str(k))) for k in range(len(os.listdir(dir_images)))]
-img[0].save(fp=fp_out, format='GIF', append_images=img[1:], duration=100,
-         save_all=True, loop=0)#diposal=2 to restore background color # duration=100
+	labeldict = {val:'' for val in G}
+	colors = ['b'] * len(G) #Initialize each vertex color to black
+
+	pos = nx.spring_layout(G)
+
+	for i in range(len(result)):
+		node_idx = result[i]
+		labeldict[node_idx] = i
+		colors[node_idx] = 'r'
+
+		nx.draw_networkx(G, pos,labels=labeldict, node_size=15,alpha=0.6, node_color=colors, with_labels=True) #width=0.3,node_size=15, 
+		nx.draw_networkx_edges(G, pos, edge_color='grey',alpha=0.1)
+		plt.savefig(dir_images +"/image_{}.png".format(str(i)), dpi=1200)
+
+
+
+	dir_gif = "gif"
+	if not os.path.exists(dir_gif):
+	    os.mkdir(dir_gif)
+
+	# filepaths
+	fp_in = dir_images +"/image_*.png"
+	fp_out = dir_gif + "/image.gif"
+
+	# https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html#gif
+	img = [Image.open(dir_images +"/image_{}.png".format(str(k))) for k in range(len(os.listdir(dir_images)))]
+	img[0].save(fp=fp_out, format='GIF', append_images=img[1:], duration=100,
+	         save_all=True, loop=0)#diposal=2 to restore background color # duration=100
