@@ -9,46 +9,8 @@ import shutil
 
 os.environ["PATH"] += os.pathsep + 'C:\Program Files\Graphviz 2.44.1/bin/'
 
-def generate_prop_graph() :
-	#Load a graph
-	G = nx.read_gpickle('network_simulation.pkl')
 
-	#Pick a propagator
-	idx = np.random.randint(len(G))
-	
-	p = 0.8
-	decay=0.2
 
-	#Get graph	
-	result, prop = BFS_propagation(G,idx,p,decay)
-
-	#Create Labels
-	labeldict = {}
-	colors = []
-	for i, val in enumerate(G):
-		if i in result:		
-			labeldict[val] = result.index(i)
-			colors.append('r')
-		else:
-			labeldict[val] = ''
-			colors.append('b')
-
-	#Print Graph
-	print(result)
-	pos = nx.drawing.nx_pydot.pydot_layout(prop, prog='dot')
-	nx.draw_networkx(prop, pos, node_size=15,alpha=0.6) #width=0.3,node_size=15, 
-	nx.draw_networkx_edges(prop, pos, edge_color='grey',alpha=0.1)
-	plt.show()
-
-	pos = nx.spring_layout(G)
-	nx.draw_networkx(G, pos,labels=labeldict, node_size=15,alpha=0.6, node_color=colors, with_labels=True) #width=0.3,node_size=15, 
-	nx.draw_networkx_edges(G, pos, edge_color='grey',alpha=0.1)
-	plt.show()
-
-	#Pickle Time
-	name=str(idx)+'_propagation_tree.pkl'
-	nx.write_gpickle(prop, name)
-	return
 
 
 def BFS_propagation(G,v,p_start,decay): #Inspired from BFS
@@ -104,8 +66,54 @@ def get_gif(G, result):
 	fp_out = dir_gif + "/image.gif"
 
 	# https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html#gif
-	img = [Image.open(dir_images +"/image_{}.png".format(str(k))) for k in range(len(os.listdir(dir_images)))]
-	img[0].save(fp=fp_out, format='GIF', append_images=img[1:], duration=100,
+	img, *imgs = [Image.open(dir_images +"/image_{}.png".format(k)) for k in range(len(os.listdir(dir_images)))]
+	img.save(fp=fp_out, format='GIF', append_images=imgs, duration=200,
 	         save_all=True, loop=0)#diposal=2 to restore background color # duration=100
 
-generate_prop_graph()
+
+def plot_propagation_grapg(prop,idx):
+	pos = nx.drawing.nx_pydot.pydot_layout(prop, prog='dot')
+	nx.draw_networkx(prop, pos, node_size=15,alpha=0.6) #width=0.3,node_size=15, 
+	nx.draw_networkx_edges(prop, pos, edge_color='grey',alpha=0.1)
+	plt.show()
+	#Pickle Time
+	name=str(idx)+'_propagation_tree.pkl'
+	nx.write_gpickle(prop, name)
+
+def plot_propagation_in_graph(G,result):
+	#Create Labels
+	labeldict = {}
+	colors = []
+	for i, val in enumerate(G):
+		if i in result:		
+			labeldict[val] = result.index(i)
+			colors.append('r')
+		else:
+			labeldict[val] = ''
+			colors.append('b')
+
+	#Print Graph
+	print(result)
+
+	pos = nx.spring_layout(G)
+	nx.draw_networkx(G, pos,labels=labeldict, node_size=15,alpha=0.6, node_color=colors, with_labels=True) #width=0.3,node_size=15, 
+	nx.draw_networkx_edges(G, pos, edge_color='grey',alpha=0.1)
+	plt.show()
+
+
+#Load Graph
+G = nx.read_gpickle('network_simulation_30.pkl')
+
+
+# def generate_prop_graph(G):
+#Pick a propagator
+idx = np.random.randint(len(G))
+
+#Model Parameters
+p = 0.8
+decay=0.2
+
+#Get graph	
+result, prop = BFS_propagation(G,idx,p,decay)
+
+get_gif(G, result)
