@@ -57,7 +57,7 @@ def get_virality(graph):
 	for node in graph.__iter__():
 		distances=Dijkstra(graph,node)
 		virality+=sum(distances.values())
-	virality=virality/size/(size-1)
+	virality=virality / (size*(size-1))
 	return virality
 
 def avg_neigh(graph):
@@ -70,11 +70,11 @@ def avg_neigh(graph):
 #	db = pkl.load(f)
 #graph = create_tree(db, root_child=70) #nx.DiGraph(G)
 
-filename = '129_propagation_tree.pkl'
-with open(filename,'rb') as f:
-	graph = pkl.load(f)
+# filename = '129_propagation_tree.pkl'
+# with open(filename,'rb') as f:
+# 	graph = pkl.load(f)
 
-idx=int(filename[0:3])
+# idx=int(filename[0:3])
 
 
 #Plot Arbre
@@ -87,10 +87,11 @@ idx=int(filename[0:3])
 
 
 
-features={'Size':nx.number_of_nodes(graph),'Depth':get_depth(graph,idx),'Breadth':get_breath(graph,idx),'Virality':get_virality(graph),'Avg_neigh':avg_neigh(graph)}
-print(features)
+# features={'Size':nx.number_of_nodes(graph),'Depth':get_depth(graph,idx),'Breadth':get_breath(graph,idx),'Virality':get_virality(graph),'Avg_neigh':avg_neigh(graph)}
+# print(features)
 
-distance = Dijkstra(graph,idx)
+# distance = Dijkstra(graph,idx)
+
 # print(type(list(distance.values())[0]))
 #print(db.head())
 #print(get_breath(distance))

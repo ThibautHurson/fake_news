@@ -11,8 +11,6 @@ os.environ["PATH"] += os.pathsep + 'C:\Program Files\Graphviz 2.44.1/bin/'
 
 
 
-
-
 def BFS_propagation(G,v,p_start,decay): #Inspired from BFS
 	Prop=nx.DiGraph()
 	seen = [v]
@@ -71,7 +69,7 @@ def get_gif(G, result):
 	         save_all=True, loop=0)#diposal=2 to restore background color # duration=100
 
 
-def plot_propagation_grapg(prop,idx):
+def plot_propagation_graph(prop,idx):
 	pos = nx.drawing.nx_pydot.pydot_layout(prop, prog='dot')
 	nx.draw_networkx(prop, pos, node_size=15,alpha=0.6) #width=0.3,node_size=15, 
 	nx.draw_networkx_edges(prop, pos, edge_color='grey',alpha=0.1)
@@ -105,7 +103,6 @@ def plot_propagation_in_graph(G,result):
 G = nx.read_gpickle('network_simulation_30.pkl')
 
 
-# def generate_prop_graph(G):
 #Pick a propagator
 idx = np.random.randint(len(G))
 
