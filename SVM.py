@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 from sklearn import datasets
 from sklearn.model_selection import train_test_split
 import random 
+import pickle as pkl
 
 # Load Data
 # x=[]
@@ -15,10 +16,9 @@ import random
 filename = 'simulation_dataset.pkl'
 with open(filename,'rb') as f:
 	db = pkl.load(f)
-
-
-x = df.drop("label", axis=1)
-y = df["label"]
+print(db.head())
+x = db.drop("label", axis=1)
+y = db["label"]
 
 
 x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, shuffle=True)
@@ -29,7 +29,10 @@ x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.3, shuffle
 
 # Change labels to +1 and -1 
 # y = np.where(y==1, y, -1)
-#y = y.astype(np.float64)
+x_train=x_train.astype(np.float64)
+x_test=x_test.astype(np.float64)
+y_train = y_train.astype(np.float64)
+y_test = y_test.astype(np.float64)
 
 # Linear Model with L2 regularization
 model = tf.keras.Sequential()
@@ -41,8 +44,7 @@ def hinge_loss(y_true, y_pred):
 
 # Train the model
 model.compile(optimizer='adam', loss=hinge_loss)
-model.fit(x_train, y_train,  epochs=30, verbose=False)
-
+model.fit(x_train, y_train,  epochs=30)
 # # Plot the learned decision boundary 
 # x_min, x_max = X[:, 0].numpy().min() - 1, X[:, 0].numpy().max() + 1
 # y_min, y_max = X[:, 1].numpy().min() - 1, X[:, 1].numpy().max() + 1
