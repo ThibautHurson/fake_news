@@ -2,7 +2,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 
-N = 150
+N = 100
 k = 1
 # erdos renyi network
 # G1 = nx.erdos_renyi_graph(N, k/N, directed=True)
@@ -12,7 +12,7 @@ k = 1
 # G3 = nx.gaussian_random_partition_graph(N,20,20,k/N,k/N)
 # G4 = nx.watts_strogatz_graph(N, 10, 0.8)
 G4 = nx.connected_watts_strogatz_graph(N, 10, 0.3, tries=30)
-nx.write_gpickle(G4, 'network_simulation.pkl')
+nx.write_gpickle(G4, 'network_simulation_{}.pkl'.format(N))
 # G4 = nx.newman_watts_strogatz_graph(N, 10, 0.3)
 # pos1 = nx.spring_layout(G1)
 # nx.draw_networkx_nodes(G1, pos1, alpha = 0.6, node_size=[2*i for i in list(dict(G1.degree).values())])

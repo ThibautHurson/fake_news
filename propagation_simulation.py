@@ -27,7 +27,7 @@ def BFS_propagation(G,v,p_start,decay): #Inspired from BFS
 				seen.append(x)
 				active.append(x)
 				distances[x] = distances[w] + 1
-	return result, Prop
+	return result, Prop, distances
 
 def get_gif(G, result):
 	# Create a directory if don't exist to store images that will be used to create the gif
@@ -99,18 +99,18 @@ def plot_propagation_in_graph(G,result):
 	plt.show()
 
 
-#Load Graph
-G = nx.read_gpickle('network_simulation_30.pkl')
+# #Load Graph
+# G = nx.read_gpickle('network_simulation_100.pkl')
 
 
-#Pick a propagator
-idx = np.random.randint(len(G))
+# #Pick a propagator
+# idx = np.random.randint(len(G))
 
-#Model Parameters
-p = 0.8
-decay=0.2
+# #Model Parameters
+# p = 0.8
+# decay=0.2
 
-#Get graph	
-result, prop = BFS_propagation(G,idx,p,decay)
+# #Get graph	
+# result, prop, _ = BFS_propagation(G,idx,p,decay)
 
-get_gif(G, result)
+# get_gif(G, result)
