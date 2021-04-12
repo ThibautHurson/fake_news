@@ -1,6 +1,6 @@
 import networkx as nx
 import matplotlib.pyplot as plt
-
+import collections
 
 N = 100
 k = 1
@@ -38,8 +38,8 @@ nx.write_gpickle(G4, 'network_simulation_{}.pkl'.format(N))
 # plt.title("Gaussian random partition")
 # plt.show()
 
-pos4 = nx.spring_layout(G4)
-nx.draw_networkx_nodes(G4, pos4, alpha = 0.6, node_size=[2*i for i in list(dict(G4.degree).values())])
-nx.draw_networkx_edges(G4, pos4, alpha=0.2)
-plt.title("watts_strogatz")
-plt.show()
+# pos4 = nx.spring_layout(G4)
+# nx.draw_networkx_nodes(G4, pos4, alpha = 0.6, node_size=[2*i for i in list(dict(G4.degree).values())])
+# nx.draw_networkx_edges(G4, pos4, alpha=0.2)
+# plt.title("watts_strogatz")
+# plt.show()
