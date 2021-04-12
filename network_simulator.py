@@ -13,6 +13,12 @@ k = 1
 # G4 = nx.watts_strogatz_graph(N, 10, 0.8)
 G4 = nx.connected_watts_strogatz_graph(N, 10, 0.3, tries=30)
 nx.write_gpickle(G4, 'network_simulation_{}.pkl'.format(N))
+
+
+# p = 0.01 pour high local clustering but low avg path length
+# https://chih-ling-hsu.github.io/2020/05/15/watts-strogatz
+
+
 # G4 = nx.newman_watts_strogatz_graph(N, 10, 0.3)
 # pos1 = nx.spring_layout(G1)
 # nx.draw_networkx_nodes(G1, pos1, alpha = 0.6, node_size=[2*i for i in list(dict(G1.degree).values())])

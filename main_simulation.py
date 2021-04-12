@@ -8,7 +8,8 @@ from features import *
 from propagation_simulation import BFS_propagation
 
 #Load Graph
-G = nx.read_gpickle('network_simulation_100.pkl')
+entry='network_simulation_100.pkl'
+G = nx.read_gpickle(entry)
 
 
 #Model Parameters
@@ -21,13 +22,18 @@ decay_fake = 0.1
 data_list = []
 for k in range(200):
 	#Pick a propagator
+	
 	idx = np.random.randint(len(G))
-
+	current_idx=0
+	for current_node in G.__iter__():
+		if current_idx == idx :
+			node_idx=current_node
+		current_idx+=1
 	#Get graph	
-	result, prop, _ = BFS_propagation(G,idx,p_true,decay_true)
+	result, prop, _ = BFS_propagation(G,node_idx,p_true,decay_true)
 	# print(result)
 
-	distances = Dijkstra(prop,idx)
+	distances = Dijkstra(prop,node_idx)
 
 	#To deal with 1-node graph
 	if len(result) >= 2:
@@ -37,12 +43,16 @@ for k in range(200):
 for k in range(200):
 	#Pick a propagator
 	idx = np.random.randint(len(G))
-
+	current_idx=0
+	for current_node in G.__iter__():
+		if current_idx == idx :
+			node_idx=current_node
+		current_idx+=1
 	#Get graph	
-	result, prop, _ = BFS_propagation(G,idx,p_fake,decay_fake)
+	result, prop, _ = BFS_propagation(G,node_idx,p_fake,decay_fake)
 	# print(result)
 
-	distances = Dijkstra(prop,idx)
+	distances = Dijkstra(prop,node_idx)
 
 	#To deal with 1-node graph	
 	if len(result) >= 2:
@@ -52,5 +62,5 @@ for k in range(200):
 
 df_true_fake = pd.DataFrame(data_list, columns=['Size','Depth','Breadth','Virality','Avg_neigh','label'])
 
-
-df_true_fake.to_pickle('simulation_dataset.pkl')
+output='dataset_'+entry
+df_true_fake.to_pickle(output)
