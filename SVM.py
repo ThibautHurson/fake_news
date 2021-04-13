@@ -46,7 +46,7 @@ model.add(tf.keras.layers.Dense(1))#, kernel_regularizer=tf.keras.regularizers.l
 
 # Train the model
 model.compile(optimizer='adam', loss=keras.losses.mse, metrics=['accuracy'])
-model.fit(x_train, y_train,epochs=50 , validation_data=(x_test, y_test))
+model.fit(x_train, y_train,epochs=20 , validation_data=(x_test, y_test))
 
 # # Plot the learned decision boundary 
 # x_min, x_max = x_test['Depth'].min() - 1, x_test['Depth'].max() + 1
@@ -57,4 +57,3 @@ model.fit(x_train, y_train,epochs=50 , validation_data=(x_test, y_test))
 # cs = plt.contourf(xx, yy, Z, cmap=plt.cm.coolwarm, alpha=0.8)
 # plt.scatter(x_test[Depth], x_test['Virality'], c=y, cmap=plt.cm.Set1)
 # plt.show()
-

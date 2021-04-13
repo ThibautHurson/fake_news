@@ -5,9 +5,10 @@ import random
 import pickle as pkl
 
 from sklearn import svm
+from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 
-filename = 'simulation_dataset_100.pkl'
+filename = 'fb_simulation_dataset.pkl'#'simulation_dataset_100.pkl'
 with open(filename,'rb') as f:
     db = pkl.load(f)
 
@@ -61,17 +62,18 @@ def plot_contours(ax, clf, xx, yy, **params):
 X = x.to_numpy()[:,[1,3]]
 y = y.to_numpy()
 
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True)
 
-X, y = shuffle(X, y, random_state=0)
+# X, y = shuffle(X, y, random_state=0)
 
 # we create an instance of SVM and fit out data. We do not scale our
 # data since we want to plot the support vectors
-C = 1.0  # SVM regularization parameter
+C = 1  # SVM regularization parameter
 models = (svm.SVC(kernel='linear', C=C),
           svm.LinearSVC(C=C, max_iter=10000),
-          svm.SVC(kernel='rbf', gamma=0.7, C=C),
+          svm.SVC(kernel='rbf', gamma='auto', C=C),
           svm.SVC(kernel='poly', degree=3, gamma='auto', C=C))
-models = (clf.fit(X, y) for clf in models)
+models = (clf.fit(X_train, y_train) for clf in models)
 
 # title for the plots
 titles = ('SVC with linear kernel',
@@ -83,13 +85,13 @@ titles = ('SVC with linear kernel',
 fig, sub = plt.subplots(2, 2)
 plt.subplots_adjust(wspace=0.4, hspace=0.4)
 
-X0, X1 = X[:, 0], X[:, 1]
+X0, X1 = X_test[:, 0], X_test[:, 1]
 xx, yy = make_meshgrid(X0, X1)
 
 for clf, title, ax in zip(models, titles, sub.flatten()):
     plot_contours(ax, clf, xx, yy,
                   cmap=plt.cm.coolwarm, alpha=0.8)
-    ax.scatter(X0, X1, c=y, cmap=plt.cm.coolwarm, s=20, edgecolors='k')
+    ax.scatter(X0, X1, c=y_test, cmap=plt.cm.coolwarm, s=20, edgecolors='k')
     ax.set_xlim(xx.min(), xx.max())
     ax.set_ylim(yy.min(), yy.max())
     ax.set_xlabel('Depth')
