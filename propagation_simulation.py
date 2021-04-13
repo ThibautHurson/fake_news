@@ -6,6 +6,8 @@ import glob
 from PIL import Image
 import os
 import shutil
+from networkx.drawing.nx_pydot  import graphviz_layout
+
 
 os.environ["PATH"] += os.pathsep + 'C:\Program Files\Graphviz 2.44.1/bin/'
 
@@ -71,7 +73,7 @@ def get_gif(G, result):
 
 def plot_propagation_graph(prop,idx):
 	pos = nx.drawing.nx_pydot.pydot_layout(prop, prog='dot')
-	nx.draw_networkx(prop, pos, node_size=15,alpha=0.6) #width=0.3,node_size=15, 
+	nx.draw_networkx(prop, pos, node_size=15,alpha=0.6,with_labels=False) #width=0.3,node_size=15, 
 	nx.draw_networkx_edges(prop, pos, edge_color='grey',alpha=0.1)
 	plt.show()
 	#Pickle Time
@@ -94,23 +96,26 @@ def plot_propagation_in_graph(G,result):
 	print(result)
 
 	pos = nx.spring_layout(G)
-	nx.draw_networkx(G, pos,labels=labeldict, node_size=15,alpha=0.6, node_color=colors, with_labels=True) #width=0.3,node_size=15, 
+	nx.draw_networkx(G, pos, labels=labeldict, node_size=15,alpha=0.6, node_color=colors, with_labels=True) #width=0.3,node_size=15,  with_labels=True
 	nx.draw_networkx_edges(G, pos, edge_color='grey',alpha=0.1)
 	plt.show()
 
 
 # #Load Graph
-# G = nx.read_gpickle('network_simulation_100.pkl')
+# G = nx.read_gpickle('network_simulation_500.pkl')
 
 
 # #Pick a propagator
 # idx = np.random.randint(len(G))
 
-# #Model Parameters
-# p = 0.8
-# decay=0.2
+# # #Model Parameters
+# p_fake = 0.5
+# decay_fake = 0.2
 
 # #Get graph	
-# result, prop, _ = BFS_propagation(G,idx,p,decay)
+# result, prop, _ = BFS_propagation(G,idx,p_fake,decay_fake)
 
-# get_gif(G, result)
+# # get_gif(G, result)
+
+
+# plot_propagation_graph(prop,idx)

@@ -8,7 +8,7 @@ from sklearn import svm
 from sklearn.model_selection import train_test_split
 from sklearn.utils import shuffle
 
-filename = 'fb_simulation_dataset.pkl'#'simulation_dataset_100.pkl'
+filename = 'dataset_network_simulation_500.pkl'#'simulation_dataset_100.pkl' #'fb_simulation_dataset.pkl'
 with open(filename,'rb') as f:
     db = pkl.load(f)
 
@@ -57,9 +57,8 @@ def plot_contours(ax, clf, xx, yy, **params):
 
 
 # Take the first two features. We could avoid this by using a two-dim dataset
-# X = iris.data[:, :2]
-# y = iris.target
-X = x.to_numpy()[:,[1,3]]
+# X = x.to_numpy()[:,[1,3]]
+X = x.to_numpy()#[:,[1,3]]
 y = y.to_numpy()
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True)
@@ -75,29 +74,53 @@ models = (svm.SVC(kernel='linear', C=C),
           svm.SVC(kernel='poly', degree=3, gamma='auto', C=C))
 models = (clf.fit(X_train, y_train) for clf in models)
 
-# title for the plots
-titles = ('SVC with linear kernel',
-          'LinearSVC (linear kernel)',
-          'SVC with RBF kernel',
-          'SVC with polynomial (degree 3) kernel')
 
-# Set-up 2x2 grid for plotting.
-fig, sub = plt.subplots(2, 2)
-plt.subplots_adjust(wspace=0.4, hspace=0.4)
+lin_model = svm.SVC(kernel='poly', degree=2, gamma='auto', C=C)
+lin_model.fit(X_train, y_train)
 
-X0, X1 = X_test[:, 0], X_test[:, 1]
-xx, yy = make_meshgrid(X0, X1)
+#Import scikit-learn metrics module for accuracy calculation
+from sklearn import metrics
 
-for clf, title, ax in zip(models, titles, sub.flatten()):
-    plot_contours(ax, clf, xx, yy,
-                  cmap=plt.cm.coolwarm, alpha=0.8)
-    ax.scatter(X0, X1, c=y_test, cmap=plt.cm.coolwarm, s=20, edgecolors='k')
-    ax.set_xlim(xx.min(), xx.max())
-    ax.set_ylim(yy.min(), yy.max())
-    ax.set_xlabel('Depth')
-    ax.set_ylabel('Virality')
-    ax.set_xticks(())
-    ax.set_yticks(())
-    ax.set_title(title)
+#Predict the response for test dataset
+y_pred = lin_model.predict(X_test)
 
-plt.show()
+
+# Model Accuracy: how often is the classifier correct?
+print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
+# Model Precision
+print("Precision:",metrics.precision_score(y_test, y_pred))
+# Model Recall
+print("Recall:",metrics.recall_score(y_test, y_pred))
+# Model F1-Score
+print("F1-Score:",metrics.recall_score(y_test, y_pred))
+
+def plot_svm():
+    # title for the plots
+    titles = ('SVC with linear kernel',
+              'LinearSVC (linear kernel)',
+              'SVC with RBF kernel',
+              'SVC with polynomial (degree 3) kernel')
+
+    # Set-up 2x2 grid for plotting.
+    fig, sub = plt.subplots(2, 2)
+    plt.subplots_adjust(wspace=0.4, hspace=0.4)
+
+    X0, X1 = X_test[:, 0], X_test[:, 1]
+    xx, yy = make_meshgrid(X0, X1)
+
+    for clf, title, ax in zip(models, titles, sub.flatten()):
+        plot_contours(ax, clf, xx, yy,
+                      cmap=plt.cm.coolwarm, alpha=0.8)
+        scatter = ax.scatter(X0, X1, c=y_test, cmap=plt.cm.coolwarm, s=20, edgecolors='k')#labels={1:'True', '0':False}
+        legend1 = ax.legend(*scatter.legend_elements(),
+                        loc="upper right", title="Classes" )
+        ax.add_artist(legend1)
+        ax.set_xlim(xx.min(), xx.max())
+        ax.set_ylim(yy.min(), yy.max())
+        ax.set_xlabel('Depth')
+        ax.set_ylabel('Virality')
+        ax.set_xticks(())
+        ax.set_yticks(())
+        ax.set_title(title)
+
+    plt.show()

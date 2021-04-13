@@ -9,22 +9,30 @@ from features import *
 from propagation_simulation import BFS_propagation
 
 #Load Graph
-entry = 'fb_network.pkl'  #'network_simulation_100.pkl'
+entry = 'network_simulation_500.pkl'#'fb_network.pkl'  #'network_simulation_100.pkl'
 G = nx.read_gpickle(entry)
 # print(nx.number_of_nodes(G))
 
 #Model Parameters
-p_true = 0.4
+# p_true = 0.3
+mu_true, sigma_true = 0.3, 0.1 # mean and standard deviation
 decay_true = 0.4
 
-p_fake = 0.6
+mu_fake, sigma_fake = 0.5, 0.2 # mean and standard deviation
+# p_fake = 0.5
 decay_fake = 0.4
+
 
 data_list = []
 
 for k in range(1000):
 	#Pick a propagator
-	
+	p_true = np.random.normal(mu_true, sigma_true)
+	if p_true < 0.001:
+		p_true = 0.001
+	elif p_true > 0.999:
+		p_true = 0.999
+
 	idx = np.random.randint(len(G))
 	current_idx=0
 	for current_node in G.__iter__():
@@ -44,6 +52,12 @@ for k in range(1000):
 
 for k in range(1000):
 	#Pick a propagator
+	p_fake = np.random.normal(mu_fake, sigma_fake)
+	if p_fake < 0.001:
+		p_fake = 0.001
+	elif p_fake > 0.999:
+		p_fake = 0.999
+
 	idx = np.random.randint(len(G))
 	current_idx=0
 	for current_node in G.__iter__():
