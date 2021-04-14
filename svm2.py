@@ -6,7 +6,11 @@ import pickle as pkl
 
 from sklearn import svm
 from sklearn.model_selection import train_test_split
+from sklearn.model_selection import cross_validate
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 from sklearn.utils import shuffle
+#Import scikit-learn metrics module for accuracy calculation
+from sklearn import metrics
 
 filename = 'dataset_network_simulation_500.pkl'#'simulation_dataset_100.pkl' #'fb_simulation_dataset.pkl'
 with open(filename,'rb') as f:
@@ -55,7 +59,6 @@ def plot_contours(ax, clf, xx, yy, **params):
 
 
 
-
 # Take the first two features. We could avoid this by using a two-dim dataset
 # X = x.to_numpy()[:,[1,3]]
 X = x.to_numpy()#[:,[1,3]]
@@ -69,36 +72,50 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle
 # data since we want to plot the support vectors
 C = 1  # SVM regularization parameter
 models = (svm.SVC(kernel='linear', C=C),
-          svm.LinearSVC(C=C, max_iter=10000),
           svm.SVC(kernel='rbf', gamma='auto', C=C),
+          svm.SVC(kernel='poly', degree=2, gamma='auto', C=C),
           svm.SVC(kernel='poly', degree=3, gamma='auto', C=C))
-models = (clf.fit(X_train, y_train) for clf in models)
+# models = (clf.fit(X_train, y_train) for clf in models)
+
+models_title = ['SVC with linear kernel',
+          'SVC with RBF kernel',
+          'SVC with polynomial (degree 2) kernel',
+          'SVC with polynomial (degree 3) kernel']
+# Cross Validation to select the best model
+scoring = ['accuracy', 'precision','recall','f1']
+scores = [cross_validate(clf, X_train, y_train, scoring=scoring) for clf in (models)]
+
+for k in range (len(scores)):
+    print(models_title[k] + '\n' + scores[k] + '\n')
+
+# Results show that we get the best results with SVC with polynomial of degree 2 
+# Training our data with the best model
+model = svm.SVC(kernel='poly', degree=2, gamma='auto', C=C)
+model.fit(X_train, y_train)
+
+# Evaluating our model with the test set
+evaluate_model(model)
 
 
-lin_model = svm.SVC(kernel='poly', degree=2, gamma='auto', C=C)
-lin_model.fit(X_train, y_train)
+def evaluate_model(model):
+    #Predict the response for test dataset
+    y_pred = model.predict(X_test)
 
-#Import scikit-learn metrics module for accuracy calculation
-from sklearn import metrics
+    # Model Accuracy: how often is the classifier correct?
+    print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
+    # Model Precision
+    print("Precision:",metrics.precision_score(y_test, y_pred))
+    # Model Recall
+    print("Recall:",metrics.recall_score(y_test, y_pred))
+    # Model F1-Score
+    print("F1-Score:",metrics.recall_score(y_test, y_pred))
 
-#Predict the response for test dataset
-y_pred = lin_model.predict(X_test)
 
-
-# Model Accuracy: how often is the classifier correct?
-print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
-# Model Precision
-print("Precision:",metrics.precision_score(y_test, y_pred))
-# Model Recall
-print("Recall:",metrics.recall_score(y_test, y_pred))
-# Model F1-Score
-print("F1-Score:",metrics.recall_score(y_test, y_pred))
-
-def plot_svm():
+def plot_svm(X_test,y_test):
     # title for the plots
     titles = ('SVC with linear kernel',
-              'LinearSVC (linear kernel)',
               'SVC with RBF kernel',
+              'SVC with polynomial (degree 2) kernel',
               'SVC with polynomial (degree 3) kernel')
 
     # Set-up 2x2 grid for plotting.
@@ -117,10 +134,13 @@ def plot_svm():
         ax.add_artist(legend1)
         ax.set_xlim(xx.min(), xx.max())
         ax.set_ylim(yy.min(), yy.max())
-        ax.set_xlabel('Depth')
-        ax.set_ylabel('Virality')
+        ax.set_xlabel('Number of Nodes')
+        ax.set_ylabel('Depth')
         ax.set_xticks(())
         ax.set_yticks(())
         ax.set_title(title)
 
     plt.show()
+
+# plot_svm(X_test,y_test)
+
