@@ -25,7 +25,7 @@ decay_fake = 0.4
 
 data_list = []
 
-for k in range(1000):
+for k in range(100):
 	#Pick a propagator
 	p_true = np.random.normal(mu_true, sigma_true)
 	if p_true < 0.001:
@@ -50,7 +50,7 @@ for k in range(1000):
 		data_list.append([nx.number_of_nodes(prop),get_max_depth(distances),get_max_breath(distances),get_virality(prop),avg_neigh(prop),1]) #get_virality(prop)
 	else: data_list.append([0,0,0,0,0,1])
 
-for k in range(1000):
+for k in range(100):
 	#Pick a propagator
 	p_fake = np.random.normal(mu_fake, sigma_fake)
 	if p_fake < 0.001:
@@ -79,5 +79,5 @@ print('Over')
 
 df_true_fake = pd.DataFrame(data_list, columns=['Size','Depth','Breadth','Virality','Avg_neigh','label'])
 
-output='dataset_'+entry
+output='dataset2_'+entry 
 df_true_fake.to_pickle(output)
