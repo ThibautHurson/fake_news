@@ -33,10 +33,11 @@ def comparaison_texte(database,texte_tweet):
 #chope user_rt_id pour chopper tous les rtweeters
 
 def find_parents3(db):
-    consumer_key = "6ljnnBOMpNjmKGHh0DpoczkMC" 
-    consumer_secret = "NDafWcimWv9AF2Aul8yQKVwcmSROmVc8D9wFEjNHGV2VdcXoPb" 
-    access_token = "1322253203296210945-HVnEkHfqdKtlX9TADHUZBHSWQvZWpP" 
-    access_token_secret = "bBmEzaEJcmwB94WRpprR1UqKqDdeGdYY1zekr2WjjTpKC" 
+    # Please put your credenials here
+    consumer_key = "" 
+    consumer_secret = ""
+    access_token = ""
+    access_token_secret = ""
       
     # authorization of consumer key and consumer secret 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret) 
@@ -150,10 +151,11 @@ def get_followings(username):
     Input: username: name of the user
     Output: list of followers ids
     '''
-    consumer_key = "6ljnnBOMpNjmKGHh0DpoczkMC" 
-    consumer_secret = "NDafWcimWv9AF2Aul8yQKVwcmSROmVc8D9wFEjNHGV2VdcXoPb" 
-    access_token = "1322253203296210945-HVnEkHfqdKtlX9TADHUZBHSWQvZWpP" 
-    access_token_secret = "bBmEzaEJcmwB94WRpprR1UqKqDdeGdYY1zekr2WjjTpKC" 
+    # Please put your credenials here
+    consumer_key = ""
+    consumer_secret =  ""
+    access_token = ""
+    access_token_secret = ""
       
     # authorization of consumer key and consumer secret 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret) 
@@ -176,10 +178,11 @@ def get_followings_from_id(user_id):
     Input: username: name of the user
     Output: list of followers ids
     '''
-    consumer_key = "6ljnnBOMpNjmKGHh0DpoczkMC" 
-    consumer_secret = "NDafWcimWv9AF2Aul8yQKVwcmSROmVc8D9wFEjNHGV2VdcXoPb" 
-    access_token = "1322253203296210945-HVnEkHfqdKtlX9TADHUZBHSWQvZWpP" 
-    access_token_secret = "bBmEzaEJcmwB94WRpprR1UqKqDdeGdYY1zekr2WjjTpKC" 
+    # Please put your credenials here
+    consumer_key = ""
+    consumer_secret =  ""
+    access_token = ""
+    access_token_secret = ""
       
     # authorization of consumer key and consumer secret 
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret) 
