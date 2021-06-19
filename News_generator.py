@@ -27,11 +27,5 @@ topics = ('ThankYouHajimeIsayama')
 username = ''
 date = ''#'2021-02-05'
 df=get_tweets(topics,username,date,True)
-#print(df['user_id'].head())
-#print(df['user_id_str'].head())
-# with open('confinement.pkl','rb') as f:
-#         df_p = pickle.load(f)        
-# print(df_p['user_id'].head())
-# print(df_p['user_id_str'].head())
 
 
