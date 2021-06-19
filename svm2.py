@@ -77,10 +77,10 @@ models = (svm.SVC(kernel='linear', C=C),
           svm.SVC(kernel='poly', degree=3, gamma='auto', C=C))
 # models = (clf.fit(X_train, y_train) for clf in models)
 
-models_title = ['SVC with linear kernel',
-          'SVC with RBF kernel',
-          'SVC with polynomial (degree 2) kernel',
-          'SVC with polynomial (degree 3) kernel']
+models_title = ['SVC with linear kernel']#,
+          # 'SVC with RBF kernel',
+          # 'SVC with polynomial (degree 2) kernel',
+          # 'SVC with polynomial (degree 3) kernel']
 # Cross Validation to select the best model
 scoring = ['accuracy', 'precision','recall','f1']
 scores = [cross_validate(clf, X_train, y_train, scoring=scoring) for clf in (models)]

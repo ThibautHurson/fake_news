@@ -32,7 +32,6 @@ def comparaison_texte(database,texte_tweet):
 
 #chope user_rt_id pour chopper tous les rtweeters
 
-
 def find_parents3(db):
     consumer_key = "6ljnnBOMpNjmKGHh0DpoczkMC" 
     consumer_secret = "NDafWcimWv9AF2Aul8yQKVwcmSROmVc8D9wFEjNHGV2VdcXoPb" 
@@ -170,8 +169,6 @@ def get_followings(username):
         ids.extend(page)
         time.sleep(20)
 
-    # print len(ids)
-
     return ids
 
 def get_followings_from_id(user_id):
@@ -179,7 +176,6 @@ def get_followings_from_id(user_id):
     Input: username: name of the user
     Output: list of followers ids
     '''
-    print('in get_following_from_id')
     consumer_key = "6ljnnBOMpNjmKGHh0DpoczkMC" 
     consumer_secret = "NDafWcimWv9AF2Aul8yQKVwcmSROmVc8D9wFEjNHGV2VdcXoPb" 
     access_token = "1322253203296210945-HVnEkHfqdKtlX9TADHUZBHSWQvZWpP" 
@@ -196,16 +192,8 @@ def get_followings_from_id(user_id):
 
     ids = []
     for page in tweepy.Cursor(api.followers_ids, id=user_id).pages():
-        print('go')
         ids.extend(page)
         time.sleep(60)
 
-    # print len(ids)
-
     return ids
-
-#print(get_followings('Pontsbschool'))
-
-#print(ids)
-
   

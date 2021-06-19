@@ -79,5 +79,5 @@ print('Over')
 
 df_true_fake = pd.DataFrame(data_list, columns=['Size','Depth','Breadth','Virality','Avg_neigh','label'])
 
-output='dataset2_'+entry 
+output='dataset_'+entry 
 df_true_fake.to_pickle(output)

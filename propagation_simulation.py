@@ -7,7 +7,7 @@ from PIL import Image
 import os
 import shutil
 from networkx.drawing.nx_pydot  import graphviz_layout
-
+import time
 
 os.environ["PATH"] += os.pathsep + 'C:\Program Files\Graphviz 2.44.1/bin/'
 
@@ -53,9 +53,10 @@ def get_gif(G, result):
 
 		nx.draw_networkx(G, pos,labels=labeldict, node_size=15,alpha=0.6, node_color=colors, with_labels=True) #width=0.3,node_size=15, 
 		nx.draw_networkx_edges(G, pos, edge_color='grey',alpha=0.1)
-		plt.savefig(dir_images +"/image_{}.png".format(str(i)), dpi=1200)
+		plt.savefig(dir_images +"/"+str(i)+".png", dpi=1200)
 
 
+	# time.sleep(30)
 
 	dir_gif = "gif"
 	if not os.path.exists(dir_gif):
@@ -66,9 +67,19 @@ def get_gif(G, result):
 	fp_out = dir_gif + "/image.gif"
 
 	# https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html#gif
-	img, *imgs = [Image.open(dir_images +"/image_{}.png".format(k)) for k in range(len(os.listdir(dir_images)))]
-	img.save(fp=fp_out, format='GIF', append_images=imgs, duration=200,
-	         save_all=True, loop=0)#diposal=2 to restore background color # duration=100
+	imgs = []
+	print('Nombre d image : ',len(os.listdir(dir_images)))
+	for k in range(len(os.listdir(dir_images))):
+		image = Image.open(dir_images +"/"+str(k)+".png")
+		imgs.append(image)
+		imgs.append(image)
+		imgs.append(image)
+		imgs.append(image)
+
+
+	# img, *imgs = [Image.open(dir_images +"/image_{}.png".format(str(k))) for k in range()]
+	imgs[0].save(fp_out, append_images=imgs[1:], #duration=200,
+	         save_all=True, duration=400, loop=0, optimizer=False)#diposal=2 to restore background color # duration=100
 
 
 def plot_propagation_graph(prop,idx):
@@ -101,21 +112,21 @@ def plot_propagation_in_graph(G,result):
 	plt.show()
 
 
-# #Load Graph
-# G = nx.read_gpickle('network_simulation_500.pkl')
+#Load Graph
+G = nx.read_gpickle('network_simulation_20.pkl')
 
 
-# #Pick a propagator
-# idx = np.random.randint(len(G))
+#Pick a propagator
+idx = np.random.randint(len(G))
 
-# # #Model Parameters
-# p_fake = 0.5
-# decay_fake = 0.2
+# #Model Parameters
+p_fake = 0.8
+decay_fake = 0.1
 
-# #Get graph	
-# result, prop, _ = BFS_propagation(G,idx,p_fake,decay_fake)
+#Get graph	
+result, prop, _ = BFS_propagation(G,idx,p_fake,decay_fake)
 
-# # get_gif(G, result)
+get_gif(G, result)
 
 
 # plot_propagation_graph(prop,idx)
